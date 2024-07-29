@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -16,15 +17,18 @@ import org.json.simple.JSONObject;
 public class UserFrame extends JFrame implements ActionListener{
 
     ImageIcon image = new ImageIcon("icon.png");
-    JButton depositButton;
-    JButton withdrawButton;
+    JButton transferButton;
+    JButton payCardButton;
     JButton displayButton;
-    JTextField depositTextField;
-    JTextField withdrawTextField;
+    JTextField transferTextField;
+    JTextField payCardTextField;
     JSONArray recordsList;
     JSONObject currentRecord;
-    String currentAccountNumber;
+    static String currentAccountNumber;
     JLabel errorLabel;
+    JLabel currentDebtLabel;
+    static JComboBox recordsBoxes;
+    JSONObject transferRecord;
 
     UserFrame(JSONObject record, JSONArray records, String accountNumber) { // Constructor
 
@@ -36,10 +40,10 @@ public class UserFrame extends JFrame implements ActionListener{
 
         this.recordsList = records;
         this.currentRecord = record;
-        this.currentAccountNumber = accountNumber;
+        UserFrame.currentAccountNumber = accountNumber;
 
         this.setIconImage(image.getImage());
-        this.getContentPane().setBackground(new Color(51, 51, 255));
+        this.getContentPane().setBackground(new Color(64, 115, 255));
 
         configureComponents();
         registerComponents();
@@ -48,45 +52,60 @@ public class UserFrame extends JFrame implements ActionListener{
     }
 
     public void configureButtons() {
-        depositButton = new JButton("Deposit");
-        depositButton.setBounds(50, 50, 100, 50);
-        depositButton.addActionListener(this);
-        depositButton.setFocusable(false);
-        withdrawButton = new JButton("Withdraw");
-        withdrawButton.setBounds(50, 125, 100, 50);
-        withdrawButton.addActionListener(this);
-        depositButton.setFocusable(false);
+        transferButton = new JButton("Transfer");
+        transferButton.setBounds(50, 50, 100, 50);
+        transferButton.addActionListener(this);
+        transferButton.setFocusable(false);
+        payCardButton = new JButton("Pay Card");
+        payCardButton.setBounds(50, 125, 100, 50);
+        payCardButton.addActionListener(this);
+        transferButton.setFocusable(false);
         displayButton = new JButton("Display");
         displayButton.setBounds(50, 200, 100, 50);
         displayButton.addActionListener(this);
-        depositButton.setFocusable(false);
+        transferButton.setFocusable(false);
     }
     
     public void configureTextFields() {
-        depositTextField = new JTextField();
-        withdrawTextField = new JTextField();
-        depositTextField.setBounds(200, 50, 100, 25);
-        withdrawTextField.setBounds(200, 125, 100, 25);
+        transferTextField = new JTextField();
+        payCardTextField = new JTextField();
+        transferTextField.setBounds(200, 50, 100, 25);
+        payCardTextField.setBounds(200, 125, 100, 25);
+        payCardTextField.setText((String) currentRecord.get("debt"));
+        payCardTextField.setEditable(false);
+        payCardTextField.setFocusable(false);
     }
 
     public void configureLabels() {
         errorLabel = new JLabel();
-        errorLabel.setBounds(200, 200, 225, 25);
+        currentDebtLabel = new JLabel("Current Debt");
+        errorLabel.setBounds(200, 200, 250, 25);
+        currentDebtLabel.setBounds(200, 100, 100, 25);
     }
 
     public void configureComponents() {
         configureButtons();
         configureTextFields();
         configureLabels();
+        configureComboBox();
+    }
+
+    public void configureComboBox() {
+        recordsBoxes = new JComboBox<>();
+        recordsBoxes.addActionListener(this);
+        recordsList.forEach( rcd -> addRecordObject( (JSONObject) rcd) );
+        recordsBoxes.setBounds(325, 50, 150, 25);
     }
 
     public void registerComponents() {
-        this.add(depositButton);
-        this.add(withdrawButton);
+        this.add(transferButton);
+        this.add(payCardButton);
         this.add(displayButton);
-        this.add(depositTextField);
-        this.add(withdrawTextField);
+        this.add(transferTextField);
+        this.add(payCardTextField);
         this.add(errorLabel);
+        this.add(recordsBoxes);
+        this.add(currentDebtLabel);
     }
 
     public void writeToFile() {
@@ -98,26 +117,85 @@ public class UserFrame extends JFrame implements ActionListener{
         }
     }
 
+    private static void addRecordObject(JSONObject record) 
+    {   
+        JSONObject recordObject = (JSONObject) record.get(UserFrame.currentAccountNumber);
+        if (recordObject == null) {
+            recordsBoxes.addItem(record);
+        }
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private void findRecordObject(JSONObject record, String inputAccount) 
+    {
+
+        JSONObject recordObject = (JSONObject) record.get(inputAccount);
+
+        if (recordObject != null) {
+            this.transferRecord = recordObject;
+        }
+         
+    }
+
     @Override 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == depositButton) {
-            if (!depositTextField.getText().equals("")) {
-                String updatedBalance = String.valueOf(Integer.valueOf(depositTextField.getText()) + Integer.valueOf((String) this.currentRecord.get("balance")));
-                this.currentRecord.put("balance", updatedBalance);
-                writeToFile();
+        if (e.getSource() == transferButton) {
+            if (isNumeric(transferTextField.getText())) {
+                String item = recordsBoxes.getSelectedItem().toString();
+                String[] itemArray = item.split("\"");
+                String transferAccountNumber = itemArray[1];
+                recordsList.forEach( rcd -> findRecordObject( (JSONObject) rcd, transferAccountNumber) );
+                
+                Integer transferRecordBalance = Integer.valueOf((String) this.transferRecord.get("balance"));
+                Integer currentRecordBalance = Integer.valueOf((String) this.currentRecord.get("balance"));
+                Integer transferAmount = Integer.valueOf(transferTextField.getText());
+
+                if (currentRecordBalance >= transferAmount) {
+                    String transferRecordUpdatedBalance = String.valueOf(transferRecordBalance + transferAmount);
+                    this.transferRecord.put("balance", transferRecordUpdatedBalance);
+                    String currentAccountUpdatedBalance = String.valueOf(currentRecordBalance - transferAmount);
+                    this.currentRecord.put("balance", currentAccountUpdatedBalance);
+                    
+                    writeToFile();
+                }
+                else {
+                    errorLabel.setText("Error: Insufficent Funds");
+                }
             }
             else {
-                errorLabel.setText("Error: Enter a number to deposit");
+                errorLabel.setText("Error: Enter a numerical value to transfer");
             }
         }
-        else if (e.getSource() == withdrawButton) {
-            if (!withdrawTextField.getText().equals("")) {
-                String updatedBalance = String.valueOf(Integer.valueOf((String) this.currentRecord.get("balance")) - Integer.valueOf(withdrawTextField.getText()));
+        else if (e.getSource() == payCardButton) {
+            if (isNumeric(payCardTextField.getText())) {
+                Integer currentRecordBalance = Integer.valueOf((String) this.currentRecord.get("balance"));
+                Integer currentRecordDebt = Integer.valueOf((String) this.currentRecord.get("debt"));
+                String updatedBalance = "0";
+                String updatedDebt = "0";
+                
+                if (currentRecordBalance >= currentRecordDebt) {
+                    updatedBalance = String.valueOf(currentRecordBalance - currentRecordDebt);
+                    updatedDebt = "0";
+                }
+                else {
+                    updatedBalance = "0";
+                    updatedDebt = String.valueOf(currentRecordDebt - currentRecordBalance);
+                }
                 this.currentRecord.put("balance", updatedBalance);
+                this.currentRecord.put("debt", updatedDebt);
                 writeToFile();
+                payCardTextField.setText((String) currentRecord.get("debt"));
             }
             else {
-                errorLabel.setText("Error: Enter a number to withdraw");
+                errorLabel.setText("Error: Enter a number to pay card");
             }
         }
         else if (e.getSource() == displayButton) {

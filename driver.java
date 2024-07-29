@@ -20,7 +20,7 @@ class driver {
             Object obj = jsonParser.parse(reader);
  
             JSONArray recordsList = (JSONArray) obj;
-            
+
             new MainFrame(recordsList);
  
         } catch (FileNotFoundException e) {

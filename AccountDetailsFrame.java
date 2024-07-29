@@ -16,6 +16,7 @@ public class AccountDetailsFrame extends JFrame implements ActionListener{
     JLabel accountNumber;
     JLabel balance;
     JLabel password;
+    JLabel debt;
     JSONObject currentRecord;
     JButton closeButton;
     String currentAccountNumber;
@@ -31,7 +32,7 @@ public class AccountDetailsFrame extends JFrame implements ActionListener{
         this.currentAccountNumber = accountNumber;
 
         this.setIconImage(image.getImage());
-        this.getContentPane().setBackground(new Color(51, 51, 255));
+        this.getContentPane().setBackground(new Color(64, 115, 255));
 
         configureComponents();
         registerComponents();
@@ -44,11 +45,13 @@ public class AccountDetailsFrame extends JFrame implements ActionListener{
         accountNumber = new JLabel("Account Number: " + this.currentAccountNumber);
         password = new JLabel("Password: " + (String) this.currentRecord.get("password"));
         balance = new JLabel("Balance: " + (String) this.currentRecord.get("balance"));
+        debt = new JLabel("Debt: " + (String) this.currentRecord.get("debt"));
 
         name.setBounds(50, 50, 125, 25);
         accountNumber.setBounds(50, 100, 175, 25);
         password.setBounds(50, 150, 125, 25);
         balance.setBounds(50, 200, 125, 25);
+        debt.setBounds(50, 250, 125, 25);
     }
 
     public void configureButton() {
@@ -69,6 +72,7 @@ public class AccountDetailsFrame extends JFrame implements ActionListener{
         this.add(password);
         this.add(accountNumber);
         this.add(closeButton);
+        this.add(debt);
     }
 
     @Override

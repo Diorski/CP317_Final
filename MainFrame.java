@@ -33,7 +33,7 @@ public class MainFrame extends JFrame implements ActionListener{
         this.recordsList = records;
 
         this.setIconImage(image.getImage());
-        this.getContentPane().setBackground(new Color(51, 51, 255));
+        this.getContentPane().setBackground(new Color(64, 115, 255));
 
         configureComponents();
         registerComponents();
@@ -52,20 +52,20 @@ public class MainFrame extends JFrame implements ActionListener{
     }
 
     public void configureComponents() {
-        configureConfirmButton();
+        configureButtons();
         configureTextField();
         configureLabels();
     }
 
-    public void configureConfirmButton() {
+    public void configureButtons() {
         confirmButton = new JButton();
-        confirmButton.setBounds(200, 100, 100, 50);
+        confirmButton.setBounds(150, 350, 100, 50);
         confirmButton.addActionListener(this);
-        confirmButton.setText("Confirm");
+        confirmButton.setText("Login");
         confirmButton.setFocusable(false);
 
         createAccount = new JButton();
-        createAccount.setBounds(350, 100, 100, 50);
+        createAccount.setBounds(250, 350, 100, 50);
         createAccount.addActionListener(this);
         createAccount.setText("Create");
         createAccount.setFocusable(false);
@@ -74,8 +74,8 @@ public class MainFrame extends JFrame implements ActionListener{
     public void configureTextField() {
         accountNumberTextField = new JTextField();
         accountPasswordTextField = new JTextField();
-        accountNumberTextField.setBounds(100, 200, 250, 20);
-        accountPasswordTextField.setBounds(100, 250, 250, 20);
+        accountNumberTextField.setBounds(125, 200, 250, 20);
+        accountPasswordTextField.setBounds(125, 250, 250, 20);
     }
 
     public void configureLabels() {
@@ -83,9 +83,9 @@ public class MainFrame extends JFrame implements ActionListener{
         passwordEnterLabel = new JLabel();
         errorMessageLabel = new JLabel();
 
-        accountEnterLabel.setBounds(25, 200, 75, 20);
+        accountEnterLabel.setBounds(50, 200, 75, 20);
         accountEnterLabel.setText("Account:");
-        passwordEnterLabel.setBounds(25, 250, 75, 20);
+        passwordEnterLabel.setBounds(50, 250, 75, 20);
         passwordEnterLabel.setText("Password:");
         errorMessageLabel.setBounds(100, 300, 250, 25);
     }
@@ -122,18 +122,6 @@ public class MainFrame extends JFrame implements ActionListener{
             String inputPassword = accountPasswordTextField.getText();
 
             if (passwordContents.equals(inputPassword)) {
-
-                String firstName = (String) recordObject.get("name");    
-                System.out.println(firstName);
-                
-
-                String lastName = (String) recordObject.get("password");  
-                System.out.println(lastName);
-                
-
-                String password = (String) recordObject.get("balance");    
-                System.out.println(password);
-
                 new UserFrame(recordObject, this.recordsList, inputAccount);
                 this.setVisible(false);
                 this.dispose();

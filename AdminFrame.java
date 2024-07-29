@@ -14,7 +14,7 @@ public class AdminFrame extends JFrame implements ActionListener{
     
     ImageIcon image = new ImageIcon("icon.png");
     JSONArray recordsList;
-    static JComboBox comboBox;
+    static JComboBox recordsBoxes;
     JButton confirmButton;
 
     AdminFrame(JSONArray records) { // Constructor
@@ -28,7 +28,7 @@ public class AdminFrame extends JFrame implements ActionListener{
         this.recordsList = records;
 
         this.setIconImage(image.getImage());
-        this.getContentPane().setBackground(new Color(51, 51, 255));
+        this.getContentPane().setBackground(new Color(64, 115, 255));
 
         configureComponents();
         registerComponents();
@@ -37,10 +37,10 @@ public class AdminFrame extends JFrame implements ActionListener{
     }
 
     public void configureComboBox() {
-        comboBox = new JComboBox<>();
-        comboBox.addActionListener(this);
+        recordsBoxes = new JComboBox<>();
+        recordsBoxes.addActionListener(this);
         recordsList.forEach( rcd -> addRecordObject( (JSONObject) rcd) );
-        comboBox.setBounds(25, 25, 350, 25);
+        recordsBoxes.setBounds(25, 25, 350, 25);
     }
 
     public void configureButton() {
@@ -57,25 +57,14 @@ public class AdminFrame extends JFrame implements ActionListener{
     }
 
     public void registerComponents() { 
-        this.add(comboBox);
+        this.add(recordsBoxes);
         this.add(confirmButton);
     }
     
     private static void addRecordObject(JSONObject record) 
     {
-        comboBox.addItem(record);
+        recordsBoxes.addItem(record);
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e){ 
-        if (e.getSource()==confirmButton) {
-            String item = comboBox.getSelectedItem().toString();
-            String[] itemArray = item.split("\"");
-            String accountNumber = itemArray[1];
-            recordsList.forEach( rcd -> parseRecordObject( (JSONObject) rcd, accountNumber) );
-        }
-    }
-
 
     private void parseRecordObject(JSONObject record, String inputAccount) 
     {
@@ -83,11 +72,21 @@ public class AdminFrame extends JFrame implements ActionListener{
         JSONObject recordObject = (JSONObject) record.get(inputAccount);
 
         if (recordObject != null) {
-            new UserFrame(recordObject, this.recordsList, inputAccount);
+            new AdminUserFrame(recordObject, this.recordsList, inputAccount);
             this.setVisible(false);
             this.dispose();
         }
          
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e){ 
+        if (e.getSource()==confirmButton) {
+            String item = recordsBoxes.getSelectedItem().toString();
+            String[] itemArray = item.split("\"");
+            String accountNumber = itemArray[1];
+            recordsList.forEach( rcd -> parseRecordObject( (JSONObject) rcd, accountNumber) );
+        }
     }
 
 }
