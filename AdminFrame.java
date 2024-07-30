@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class AdminFrame extends JFrame implements ActionListener{
+public class AdminFrame extends JFrame implements ActionListener{ // Each of the GUI classes will extend JFrame and most that have button interactable will implement ActionListener interface to allow for inputs
     
     ImageIcon image = new ImageIcon("icon.png");
     JSONArray recordsList;

@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,7 +14,7 @@ import javax.swing.JTextField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class AccountCreateFrame extends JFrame implements ActionListener {
+public class AccountCreateFrame extends JFrame implements ActionListener { // Each of the GUI classes will extend JFrame and most that have button interactable will implement ActionListener interface to allow for inputs
     
     JSONArray recordsList;
     JButton confirmButton;
@@ -28,6 +29,7 @@ public class AccountCreateFrame extends JFrame implements ActionListener {
     JLabel accountBalanceLabel;
     JLabel accountPasswordLabel; 
     JLabel errorMessageLabel;
+    ImageIcon image = new ImageIcon("icon.png");
 
     AccountCreateFrame(JSONArray records) {
         this.setTitle("Account Creation");
@@ -38,6 +40,9 @@ public class AccountCreateFrame extends JFrame implements ActionListener {
 
         this.recordsList = records;
 
+        this.getContentPane().setBackground(new Color(64, 115, 255));
+
+        this.setIconImage(image.getImage());
         this.getContentPane().setBackground(new Color(64, 115, 255));
 
         configureComponents();
