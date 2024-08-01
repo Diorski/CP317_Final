@@ -26,7 +26,7 @@ public class AccountDetailsFrame extends JFrame implements ActionListener{ // Ea
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
         this.setResizable(false);
-        this.setSize(500, 500); // Temp size
+        this.setSize(500, 500); 
 
         this.currentRecord = record;
         this.currentAccountNumber = accountNumber;
